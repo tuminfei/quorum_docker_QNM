@@ -1,0 +1,51 @@
+version: '2'
+services:
+  node_1:
+    image: adharaprojects/basic-quorum:0.0.1
+    environment:
+      - KEEP_FILES=false
+      - NODE_NAME=node1
+      - CONSENSUS=istanbul
+      - ROLE=coordinator
+      - IP=172.14.0.2
+    networks:
+      three_node_quorum:
+        ipv4_address: '172.14.0.2'
+  node_2:
+    image: adharaprojects/basic-quorum:0.0.1
+    environment:
+      - KEEP_FILES=false
+      - NODE_NAME=node2
+      - CONSENSUS=istanbul
+      - IP=172.14.0.3
+      - COORDINATING_IP=172.14.0.2
+      - ROLE=dynamicPeer
+      - DEPENDENT_IP=172.14.0.2
+    links:
+      - "node_1:node_1"
+    networks:
+      three_node_quorum:
+        ipv4_address: '172.14.0.3'
+  node_3:
+    image: adharaprojects/basic-quorum:0.0.1
+    environment:
+      - KEEP_FILES=false
+      - NODE_NAME=node3
+      - CONSENSUS=istanbul
+      - IP=172.14.0.4
+      - COORDINATING_IP=172.14.0.2
+      - ROLE=dynamicPeer
+      - DEPENDENT_IP=172.14.0.3
+    links:
+      - "node_1:node_1"
+    networks:
+      three_node_quorum:
+        ipv4_address: '172.14.0.4'
+
+networks:
+  three_node_quorum:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.14.0.0/16
